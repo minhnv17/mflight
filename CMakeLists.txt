@@ -2,6 +2,14 @@ cmake_minimum_required(VERSION 3.12)
 
 include(tool/gcc_compiler.cmake)
 
+if(NOT DEFINED CORE)
+    message(FATAL_ERROR "You must specify -DCORE=<value> when running cmake.")
+endif()
+
+if(NOT CMAKE_GENERATOR STREQUAL "Unix Makefiles")
+    message(FATAL_ERROR "Only the \"Unix Makefiles\" generator is supported for this project.")
+endif()
+
 if(CORE STREQUAL "STM32F051")
     message(STATUS "Building firmware for STM32F051")
     include(core/STM32F051/core.cmake)

@@ -4,4 +4,4 @@
 set(CMAKE_SYSTEM_NAME Generic)
 
 # Khai báo compiler
-set(CMAKE_C_COMPILER arm-none-eabi-gcc)
+set(CMAKE_C_COMPILER C:/Arm/gcc-arm-none-eabi-10.1/bin/arm-none-eabi-gcc.exe)
