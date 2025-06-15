@@ -1,6 +1,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx.h"
 #include "stm32f1xx_hal.h"
+#include "FreeRTOS.h"
+#include "task.h"
+
+#define TASK_IDLE_PRIORITY 1U
 
 /* Private includes ----------------------------------------------------------*/
 void Error_Handler(void);
@@ -8,13 +12,12 @@ void Error_Handler(void);
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM_Init(void);
+static void Task1(void *arg);
 
-/**
- * @brief  The application entry point.
- * @retval int
- */
 int main(void)
 {
+    TaskHandle_t xHandle = NULL;
+
     HAL_Init();
     /* Configure the system clock */
     SystemClock_Config();
@@ -26,13 +29,8 @@ int main(void)
     TIM4->CCR1 = 100;
     TIM4->CR1 |= TIM_CR1_CEN;
 
-    while (1)
-    {
-        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-        HAL_Delay(1000);
-        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-        HAL_Delay(1000);
-    }
+    xTaskCreate(Task1, "Task1", 50, (void *)1, TASK_IDLE_PRIORITY, &xHandle);
+    vTaskStartScheduler();
 }
 
 /**
@@ -119,6 +117,17 @@ static void MX_GPIO_Init(void)
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 }
 
+static void Task1(void *arg)
+{
+    for (;;)
+    {
+        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
 /**
  * @brief  This function is executed in case of error occurrence.
  * @retval None
@@ -129,4 +138,11 @@ void Error_Handler(void)
     while (1)
     {
     }
+}
+
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
+{
+    printf("Stack overflow in task: %s\n", pcTaskName);
+    for (;;)
+        ;
 }

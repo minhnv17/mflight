@@ -34,6 +34,9 @@ list(APPEND SOURCES ${HAL_SOURCES})
 # Freertos define source
 file(GLOB FREERTOS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/FreeRTOS/*.c)
 list(APPEND SOURCES ${FREERTOS_SOURCES})
+file(GLOB FREERTOS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/FreeRTOS/portable/GCC/${FREERTOS_CORE}/*.c)
+list(APPEND SOURCES ${FREERTOS_SOURCES})
+list(APPEND SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/FreeRTOS/portable/MemMang/heap_4.c)
 
 add_executable(${TARGET_BUILD} src/main.c ${SOURCES})
 
