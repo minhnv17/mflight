@@ -13,9 +13,11 @@ endif()
 if(CORE STREQUAL "STM32F051")
     message(STATUS "Building firmware for STM32F051")
     include(core/STM32F051/core.cmake)
+    set(FREERTOS_CORE "ARM_CM0")
 elseif(CORE STREQUAL "STM32F103")
     message(STATUS "Building firmware for STM32F103")
     include(core/STM32F103/core.cmake)
+    set(FREERTOS_CORE "ARM_CM3")
 else()
     message(FATAL_ERROR "CORE '${CORE}' is not supported!")
 endif()
@@ -29,7 +31,18 @@ set(TARGET_BUILD ${PROJECT_NAME}_${CORE}.elf)
 file(GLOB HAL_SOURCES ${HAL_DRIVER_PATH}/Src/*.c)
 list(APPEND SOURCES ${HAL_SOURCES})
 
+# Freertos define source
+file(GLOB FREERTOS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/FreeRTOS/*.c)
+list(APPEND SOURCES ${FREERTOS_SOURCES})
+
 add_executable(${TARGET_BUILD} src/main.c ${SOURCES})
+
+# FreeRTOS include dir
+target_include_directories(${TARGET_BUILD}
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/FreeRTOS/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/FreeRTOS/portable/GCC/${FREERTOS_CORE}
+)
 
 target_include_directories(${TARGET_BUILD}
     PUBLIC
